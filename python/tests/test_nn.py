@@ -658,6 +658,26 @@ class TestLayers(mlx_tests.MLXTestCase):
         self.assertEqual(c.weight.shape, (C_out, ks, C_in // groups))
         self.assertEqual(y.shape, (N, L - ks + 1, C_out))
 
+    def test_conv_transpose1d(self):
+        N = 5
+        L = 12
+        ks = 3
+        C_in = 2
+        C_out = 4
+        x = mx.ones((N, L, C_in))
+        c = nn.ConvTranspose1d(in_channels=C_in, out_channels=C_out, kernel_size=ks)
+        y = c(x)
+        self.assertEqual(y.shape, (N, L + ks - 1, C_out))
+        self.assertTrue("bias" in c.parameters())
+
+        groups = C_in
+        c = nn.ConvTranspose1d(
+            in_channels=C_in, out_channels=C_out, kernel_size=ks, groups=groups
+        )
+        y = c(x)
+        self.assertEqual(c.weight.shape, (C_out, ks, C_in // groups))
+        self.assertEqual(y.shape, (N, L + ks - 1, C_out))
+
     def test_conv2d(self):
         x = mx.ones((4, 8, 8, 3))
         c = nn.Conv2d(3, 1, 8)
